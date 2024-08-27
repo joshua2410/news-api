@@ -1,9 +1,17 @@
 const express = require("express");
-const { getTopics, getEnds } = require("./controllers/news.controllers");
+const {
+  getTopics,
+  getEnds,
+  getArticle,
+} = require("./controllers/news.controllers");
+const { errorHandler, psqlError } = require("./error-handler");
 const app = express();
 app.use(express.json());
 
 app.get("/api/topics", getTopics);
 app.get("/api", getEnds);
+app.get("/api/articles/:article_id", getArticle);
+app.use(errorHandler);
+app.use(psqlError);
 
 module.exports = app;
