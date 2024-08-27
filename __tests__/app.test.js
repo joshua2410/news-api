@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(data);
@@ -35,11 +36,44 @@ describe("/api", () => {
         .get("/api")
         .expect(200)
         .then((response) => {
-          for (const end in response.body.endpoints) {
-            expect(typeof response.body.endpoints[end].description).toBe(
-              "string"
-            );
-          }
+          expect(response.body.endpoints).toEqual(endpoints);
+        });
+    });
+  });
+});
+describe("/api/articles", () => {
+  describe("GET /api/articles/:article_id", () => {
+    it("200: all articles with correct properties", () => {
+      return request(app)
+        .get("/api/articles/2")
+        .expect(200)
+        .then((response) => {
+          expect(typeof response.body.article[0].author).toBe("string");
+          expect(typeof response.body.article[0].title).toBe("string");
+          expect(typeof response.body.article[0].article_id).toBe("number");
+          expect(typeof response.body.article[0].body).toBe("string");
+          expect(typeof response.body.article[0].topic).toBe("string");
+          expect(typeof response.body.article[0].created_at).toBe("string");
+          expect(typeof response.body.article[0].votes).toBe("number");
+          expect(typeof response.body.article[0].article_img_url).toBe(
+            "string"
+          );
+        });
+    });
+    it("404: article id does not exist", () => {
+      return request(app)
+        .get("/api/articles/999")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400: article id is not valid", () => {
+      return request(app)
+        .get("/api/articles/notanid")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
         });
     });
   });
