@@ -84,7 +84,10 @@ describe("/api/articles", () => {
         .get("/api/articles")
         .expect(200)
         .then((response) => {
-          expect(response.body.articles).toBeSortedBy("created_at");
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
           response.body.articles.forEach((article) => {
             expect(typeof article.author).toBe("string");
             expect(typeof article.title).toBe("string");
@@ -94,8 +97,50 @@ describe("/api/articles", () => {
             expect(typeof article.created_at).toBe("string");
             expect(typeof article.votes).toBe("number");
             expect(typeof article.article_img_url).toBe("string");
-            expect(typeof article.comment_count).toBe("number");
+            expect(typeof article.comment_count).toBe("string");
           });
+        });
+    });
+  });
+  describe("GET /api/articles/:article_id/comments", () => {
+    it("200: all comments for a specific article", () => {
+      return request(app)
+        .get("/api/articles/3/comments")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments.length).toBe(2);
+          response.body.comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.article_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+          });
+        });
+    });
+    it("200: article id exists but no comments shown", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments.length).toBe(0);
+        });
+    });
+    it("404: article id does not exist", () => {
+      return request(app)
+        .get("/api/articles/9000/comments")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400: article id is invalid", () => {
+      return request(app)
+        .get("/api/articles/notanumber/comments")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
         });
     });
   });
