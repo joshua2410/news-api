@@ -1,7 +1,12 @@
-const { allTopics, allEnds, oneArticle } = require("../models/news.models");
+const {
+  fetchArticles,
+  fetchTopics,
+  fetchEnds,
+  fetchArticle,
+} = require("../models/news.models");
 
 exports.getTopics = (req, res, next) => {
-  allTopics()
+  fetchTopics()
     .then((topics) => {
       res.status(200).send({ topics });
     })
@@ -11,7 +16,7 @@ exports.getTopics = (req, res, next) => {
 };
 
 exports.getEnds = (req, res, next) => {
-  allEnds()
+  fetchEnds()
     .then((endpoints) => {
       res.status(200).send({ endpoints });
     })
@@ -22,9 +27,19 @@ exports.getEnds = (req, res, next) => {
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
-  oneArticle(article_id)
+  fetchArticle(article_id)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getArticles = (req, res, next) => {
+  fetchArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch((err) => {
       next(err);

@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const endpoints = require("../endpoints.json");
+require("jest-sorted");
 
 beforeEach(() => {
   return seed(data);
@@ -43,14 +44,14 @@ describe("/api", () => {
 });
 describe("/api/articles", () => {
   describe("GET /api/articles/:article_id", () => {
-    it("200: all articles with correct properties", () => {
+    it("200: article with correct properties", () => {
       return request(app)
         .get("/api/articles/2")
         .expect(200)
         .then((response) => {
           expect(typeof response.body.article[0].author).toBe("string");
           expect(typeof response.body.article[0].title).toBe("string");
-          expect(typeof response.body.article[0].article_id).toBe("number");
+          expect(response.body.article[0].article_id).toBe(2);
           expect(typeof response.body.article[0].body).toBe("string");
           expect(typeof response.body.article[0].topic).toBe("string");
           expect(typeof response.body.article[0].created_at).toBe("string");
@@ -74,6 +75,27 @@ describe("/api/articles", () => {
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
+  describe("GET /api/articles", () => {
+    it("200: all articles shown", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy("created_at");
+          response.body.articles.forEach((article) => {
+            expect(typeof article.author).toBe("string");
+            expect(typeof article.title).toBe("string");
+            expect(typeof article.article_id).toBe("number");
+            expect(article.body).toBe(undefined);
+            expect(typeof article.topic).toBe("string");
+            expect(typeof article.created_at).toBe("string");
+            expect(typeof article.votes).toBe("number");
+            expect(typeof article.article_img_url).toBe("string");
+            expect(typeof article.comment_count).toBe("number");
+          });
         });
     });
   });
