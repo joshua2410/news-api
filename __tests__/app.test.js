@@ -28,3 +28,19 @@ describe("/api/topics", () => {
     });
   });
 });
+describe("/api", () => {
+  describe("GET /api", () => {
+    it("200: all endpoints with descriptions", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then((response) => {
+          for (const end in response.body.endpoints) {
+            expect(typeof response.body.endpoints[end].description).toBe(
+              "string"
+            );
+          }
+        });
+    });
+  });
+});
