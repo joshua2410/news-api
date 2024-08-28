@@ -45,7 +45,7 @@
   "GET /api/articles/:article_id/comments": {
     "description": "serves selected comments by article id",
     "exampleResponse": {
-      "articles": [
+      "comments": [
         {
           "comment_id": 2,
           "votes": 66,

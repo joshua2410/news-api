@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
 const { checkCategoryExists } = require("../db/seeds/utils");
+const format = require("pg-format");
 
 exports.fetchTopics = () => {
   return db.query(`SELECT*FROM topics`).then(({ rows }) => {
@@ -37,14 +38,33 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchComments = (id) => {
-  const queryProms = [];
-  queryProms.push(checkCategoryExists("articles", "article_id", id));
-  queryProms.push(db.query(`SELECT*FROM comments WHERE article_id = $1`, [id]));
-  return Promise.all(queryProms).then((results) => {
-    if (results.length === 1) {
-      return results[0].rows;
-    } else {
-      return results[1].rows;
-    }
+  return this.fetchArticle(id).then(() => {
+    return db
+      .query(`SELECT*FROM comments WHERE article_id = $1`, [id])
+      .then(({ rows }) => {
+        return rows;
+      });
+  });
+};
+
+exports.sendComment = (data, id) => {
+  return this.fetchArticle(id).then(() => {
+    const { username, body } = data;
+    const name = "unknown";
+    return db
+      .query(`INSERT INTO users (username, name) VALUES ($1,$2) RETURNING*;`, [
+        username,
+        name,
+      ])
+      .then(() => {
+        return db
+          .query(
+            `INSERT INTO comments ( author, body, article_id) VALUES ($1,$2,$3) RETURNING*;`,
+            [username, body, id]
+          )
+          .then(({ rows }) => {
+            return rows;
+          });
+      });
   });
 };
