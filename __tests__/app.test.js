@@ -144,4 +144,51 @@ describe("/api/articles", () => {
         });
     });
   });
+  describe("POST /api/articles/:article_id/comments", () => {
+    it("200: responds with posted comment", () => {
+      const comment = {
+        username: "TheRockLover9000",
+        body: "What an amazing aricle!",
+      };
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(comment)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.comment.length).toBe(1);
+          expect(response.body.comment[0].body).toBe("What an amazing aricle!");
+          expect(response.body.comment[0].author).toBe("TheRockLover9000");
+          expect(response.body.comment[0].article_id).toBe(2);
+          expect(response.body.comment[0].votes).toBe(0);
+          expect(response.body.comment[0].comment_id).toBe(19);
+          expect(typeof response.body.comment[0].created_at).toBe("string");
+        });
+    });
+    it("400: article id is invalid", () => {
+      const comment = {
+        username: "TheRockLover9000",
+        body: "What an amazing aricle!",
+      };
+      return request(app)
+        .post("/api/articles/notanumber/comments")
+        .send(comment)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("404: article id is not found", () => {
+      const comment = {
+        username: "TheRockLover9000",
+        body: "What an amazing aricle!",
+      };
+      return request(app)
+        .post("/api/articles/999/comments")
+        .send(comment)
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+  });
 });
