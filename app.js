@@ -7,8 +7,14 @@ const {
   getComments,
   postComment,
   patchVotes,
+  deleteComment,
 } = require("./controllers/news.controllers");
-const { errorHandler, psqlError, error } = require("./error-handler");
+const {
+  errorHandler,
+  psqlError,
+  sendError,
+  missingBodyError,
+} = require("./error-handler");
 const app = express();
 app.use(express.json());
 
@@ -19,8 +25,10 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getComments);
 app.post("/api/articles/:article_id/comments", postComment);
 app.patch("/api/articles/:article_id", patchVotes);
+app.delete("/api/comments/:comment_id", deleteComment);
 app.use(errorHandler);
 app.use(psqlError);
-app.use(error);
+app.use(sendError);
+app.use(missingBodyError);
 
 module.exports = app;

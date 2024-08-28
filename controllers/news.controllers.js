@@ -6,6 +6,7 @@ const {
   fetchComments,
   sendComment,
   updateVotes,
+  commentToDelete,
 } = require("../models/news.models");
 
 exports.getTopics = (req, res, next) => {
@@ -78,6 +79,17 @@ exports.patchVotes = (req, res, next) => {
   updateVotes(body, article_id)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  commentToDelete(comment_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);

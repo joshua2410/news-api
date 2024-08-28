@@ -9,8 +9,14 @@ exports.psqlError = (err, req, res, next) => {
   } else next(err);
 };
 
-exports.error = (err, req, res, next) => {
+exports.sendError = (err, req, res, next) => {
   if (err.code === "42703") {
+    res.status(400).send({ msg: "bad request" });
+  } else next(err);
+};
+
+exports.missingBodyError = (err, req, res, next) => {
+  if (err.code === "23502") {
     res.status(400).send({ msg: "bad request" });
   } else next(err);
 };
