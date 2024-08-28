@@ -67,8 +67,8 @@ exports.updateVotes = (data, id) => {
   const { inc_votes } = data;
   return db
     .query(
-      `UPDATE articles SET votes = votes+${inc_votes} WHERE article_id = $1 RETURNING*`,
-      [id]
+      `UPDATE articles SET votes = votes+ $1 WHERE article_id = $2 RETURNING*`,
+      [inc_votes, id]
     )
     .then(({ rows }) => {
       if (rows.length === 0)
@@ -84,4 +84,10 @@ exports.commentToDelete = (id) => {
       if (rows.length === 0)
         return Promise.reject({ status: 404, msg: "not found" });
     });
+};
+
+exports.fetchUsers = () => {
+  return db.query(`SELECT*FROM users;`).then(({ rows }) => {
+    return rows;
+  });
 };
