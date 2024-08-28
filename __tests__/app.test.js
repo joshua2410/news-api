@@ -335,3 +335,16 @@ describe("checkCategoryExists()", () => {
     });
   });
 });
+
+describe("/api/users", () => {
+  describe("GET /api/users", () => {
+    it("200: responds with all users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.users).toEqual(data.userData);
+        });
+    });
+  });
+});

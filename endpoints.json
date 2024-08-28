@@ -56,5 +56,51 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a comment and serves new comment",
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 2,
+          "votes": 66,
+          "author": "PewDiePie",
+          "body": "comment contents",
+          "created_at": "2020-09-28T14:34:13.341Z",
+          "article_id": 6
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates vote count in articles and serves updated article",
+    "exampleResponse": {
+      "comments": [
+        {
+          "title": "Why Radiohead are the best band ever",
+          "topic": "music",
+          "author": "me",
+          "body": "Everyone else playing for second place",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 999999999,
+          "comment_count": 6
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes selected comment and serves nothing"
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "exampleResponse": {
+      "articles": [
+        {
+          "username": "lurker",
+          "name": "do_nothing",
+          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        }
+      ]
+    }
   }
 }
