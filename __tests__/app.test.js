@@ -299,7 +299,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  describe("GET /api/articles/queries", () => {
+  describe("GET /api/articles? sort_by & order", () => {
     it("200: when using sort_by query with order", () => {
       return request(app)
         .get("/api/articles?sort_by=article_id&order=ASC")
@@ -335,6 +335,48 @@ describe("/api/articles", () => {
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
+  describe("/api/articles?topic=", () => {
+    it("200: returns all articles with queried topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+          response.body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    it("200: returns all articles with queried topic and sort by", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch&sort_by=author")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("author", {
+            descending: true,
+          });
+          response.body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    it("200: returns all articles with queried topic and sort by and order", () => {
+      return request(app)
+        .get("/api/articles?topic=cats&sort_by=author&order=ASC")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("article_id");
+          response.body.articles.forEach((article) => {
+            expect(article.topic).toBe("cats");
+          });
         });
     });
   });
