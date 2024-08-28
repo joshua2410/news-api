@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
 const format = require("pg-format");
+const { checkCategoryExists } = require("../db/seeds/utils");
 
 exports.fetchTopics = () => {
   return db.query(`SELECT*FROM topics`).then(({ rows }) => {
@@ -49,22 +50,16 @@ exports.fetchComments = (id) => {
 exports.sendComment = (data, id) => {
   return this.fetchArticle(id).then(() => {
     const { username, body } = data;
-    const name = "unknown";
-    return db
-      .query(`INSERT INTO users (username, name) VALUES ($1,$2) RETURNING*;`, [
-        username,
-        name,
-      ])
-      .then(() => {
-        return db
-          .query(
-            `INSERT INTO comments ( author, body, article_id) VALUES ($1,$2,$3) RETURNING*;`,
-            [username, body, id]
-          )
-          .then(({ rows }) => {
-            return rows;
-          });
-      });
+    return checkCategoryExists("users", "username", username).then(() => {
+      return db
+        .query(
+          `INSERT INTO comments ( author, body, article_id) VALUES ($1,$2,$3) RETURNING*;`,
+          [username, body, id]
+        )
+        .then(({ rows }) => {
+          return rows;
+        });
+    });
   });
 };
 
@@ -79,5 +74,14 @@ exports.updateVotes = (data, id) => {
       if (rows.length === 0)
         return Promise.reject({ status: 404, msg: "not found" });
       else return rows;
+    });
+};
+
+exports.commentToDelete = (id) => {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING*`, [id])
+    .then(({ rows }) => {
+      if (rows.length === 0)
+        return Promise.reject({ status: 404, msg: "not found" });
     });
 };

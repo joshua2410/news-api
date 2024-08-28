@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const endpoints = require("../endpoints.json");
+const { checkCategoryExists } = require("../db/seeds/utils");
 require("jest-sorted");
 
 beforeEach(() => {
@@ -147,8 +148,8 @@ describe("/api/articles", () => {
   describe("POST /api/articles/:article_id/comments", () => {
     it("200: responds with posted comment", () => {
       const comment = {
-        username: "TheRockLover9000",
-        body: "What an amazing aricle!",
+        username: "butter_bridge",
+        body: "What an amazing article!",
       };
       return request(app)
         .post("/api/articles/2/comments")
@@ -156,9 +157,31 @@ describe("/api/articles", () => {
         .expect(201)
         .then((response) => {
           expect(response.body.comment.length).toBe(1);
-          expect(response.body.comment[0].body).toBe("What an amazing aricle!");
-          expect(response.body.comment[0].author).toBe("TheRockLover9000");
+          expect(response.body.comment[0].body).toBe(
+            "What an amazing article!"
+          );
+          expect(response.body.comment[0].author).toBe("butter_bridge");
           expect(response.body.comment[0].article_id).toBe(2);
+          expect(response.body.comment[0].votes).toBe(0);
+          expect(response.body.comment[0].comment_id).toBe(19);
+          expect(typeof response.body.comment[0].created_at).toBe("string");
+        });
+    });
+    it("200: responds with posted comment when given more keys", () => {
+      const comment = {
+        username: "butter_bridge",
+        body: "Wow that was great",
+        notakey: "Skibidi",
+      };
+      return request(app)
+        .post("/api/articles/4/comments")
+        .send(comment)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.comment.length).toBe(1);
+          expect(response.body.comment[0].body).toBe("Wow that was great");
+          expect(response.body.comment[0].author).toBe("butter_bridge");
+          expect(response.body.comment[0].article_id).toBe(4);
           expect(response.body.comment[0].votes).toBe(0);
           expect(response.body.comment[0].comment_id).toBe(19);
           expect(typeof response.body.comment[0].created_at).toBe("string");
@@ -166,8 +189,8 @@ describe("/api/articles", () => {
     });
     it("400: article id is invalid", () => {
       const comment = {
-        username: "TheRockLover9000",
-        body: "What an amazing aricle!",
+        username: "butter_bridge",
+        body: "What an amazing article!",
       };
       return request(app)
         .post("/api/articles/notanumber/comments")
@@ -177,13 +200,38 @@ describe("/api/articles", () => {
           expect(response.body.msg).toBe("bad request");
         });
     });
+    it("400: invalid post", () => {
+      const comment = {
+        username: "butter_bridge",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(comment)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
     it("404: article id is not found", () => {
       const comment = {
-        username: "TheRockLover9000",
-        body: "What an amazing aricle!",
+        username: "butter_bridge",
+        body: "What an amazing article!",
       };
       return request(app)
         .post("/api/articles/999/comments")
+        .send(comment)
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("404: username not found", () => {
+      const comment = {
+        username: "therocklover9000",
+        body: "needs more tequila",
+      };
+      return request(app)
+        .post("/api/articles/6/comments")
         .send(comment)
         .expect(404)
         .then((response) => {
@@ -194,6 +242,20 @@ describe("/api/articles", () => {
   describe("PATCH /api/articles/:article_id", () => {
     it("201: responds with updated article", () => {
       const update = { inc_votes: 22 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(update)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.article[0].article_id).toBe(1);
+          expect(response.body.article[0].votes).toBe(122);
+          expect(response.body.article[0].title).toBe(
+            "Living in the shadow of a great man"
+          );
+        });
+    });
+    it("201: responds with updated article when given more keys", () => {
+      const update = { inc_votes: 22, shouldnotexist: 6000 };
       return request(app)
         .patch("/api/articles/1")
         .send(update)
@@ -235,6 +297,41 @@ describe("/api/articles", () => {
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
         });
+    });
+  });
+});
+
+describe("/api/comments", () => {
+  describe("DELETE /api/comments/:comment_id", () => {
+    it("204: responds with nothing and deletes comment", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+    it("404: responds with not found when no comment", () => {
+      return request(app)
+        .delete("/api/comments/666")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400: responds with bad request for invalid id", () => {
+      return request(app)
+        .delete("/api/comments/notanid")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
+});
+
+describe("checkCategoryExists()", () => {
+  it("responds with row from specified id", () => {
+    return checkCategoryExists("articles", "article_id", 1).then((response) => {
+      expect(response[0].article_id).toEqual(1);
+      expect(response[0].title).toEqual("Living in the shadow of a great man");
+      expect(response[0].topic).toEqual("mitch");
+      expect(response[0].author).toEqual("butter_bridge");
     });
   });
 });
