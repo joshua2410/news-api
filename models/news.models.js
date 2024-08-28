@@ -27,14 +27,21 @@ exports.fetchArticle = (id) => {
     });
 };
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT articles.article_id, articles.author, articles.title, articles.topic,articles.created_at,articles.votes,articles.article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.fetchArticles = (sort_by, order) => {
+  let queryStr = `SELECT articles.article_id, articles.author, articles.title, articles.topic,articles.created_at,articles.votes,articles.article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id`;
+
+  if (sort_by && order) {
+    queryStr += ` ORDER BY ${sort_by} ${order};`;
+  } else if (order) {
+    queryStr += ` ORDER BY created_at ${order};`;
+  } else if (sort_by) {
+    queryStr += ` ORDER BY ${sort_by} DESC;`;
+  } else {
+    queryStr += ` ORDER BY created_at DESC;`;
+  }
+  return db.query(queryStr).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.fetchComments = (id) => {
