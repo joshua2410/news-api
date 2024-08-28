@@ -78,6 +78,14 @@ describe("/api/articles", () => {
           expect(response.body.msg).toBe("bad request");
         });
     });
+    it("200: article id also contains comment count", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.article[0].comment_count).toBe("11");
+        });
+    });
   });
   describe("GET /api/articles", () => {
     it("200: all articles shown", () => {
@@ -377,6 +385,14 @@ describe("/api/articles", () => {
           response.body.articles.forEach((article) => {
             expect(article.topic).toBe("cats");
           });
+        });
+    });
+    it("404: not found when filtering an invalid topic", () => {
+      return request(app)
+        .get("/api/articles?topic=invalidquery")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
         });
     });
   });

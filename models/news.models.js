@@ -19,7 +19,10 @@ exports.fetchEnds = () => {
 
 exports.fetchArticle = (id) => {
   return db
-    .query(`SELECT*FROM articles WHERE article_id = $1`, [id])
+    .query(
+      `SELECT articles.article_id, articles.author, articles.body, articles.title, articles.topic,articles.created_at,articles.votes,articles.article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id;`,
+      [id]
+    )
     .then(({ rows }) => {
       if (rows.length === 0)
         return Promise.reject({ msg: "not found", status: 404 });
@@ -47,6 +50,8 @@ exports.fetchArticles = (sort_by, order, topic) => {
     queryStr += ` ORDER BY created_at DESC;`;
   }
   return db.query(queryStr, queryVals).then(({ rows }) => {
+    if (rows.length === 0)
+      return Promise.reject({ status: 404, msg: "not found" });
     return rows;
   });
 };
