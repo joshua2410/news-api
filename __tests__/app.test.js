@@ -191,4 +191,50 @@ describe("/api/articles", () => {
         });
     });
   });
+  describe("PATCH /api/articles/:article_id", () => {
+    it("201: responds with updated article", () => {
+      const update = { inc_votes: 22 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(update)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.article[0].article_id).toBe(1);
+          expect(response.body.article[0].votes).toBe(122);
+          expect(response.body.article[0].title).toBe(
+            "Living in the shadow of a great man"
+          );
+        });
+    });
+    it("404: article id is not found", () => {
+      const update = { inc_votes: 22 };
+      return request(app)
+        .patch("/api/articles/999")
+        .send(update)
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400: article id is invalid", () => {
+      const update = { inc_votes: 22 };
+      return request(app)
+        .patch("/api/articles/notanid")
+        .send(update)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("400: invalid patch", () => {
+      const update = { inc_votes: "notanumber" };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(update)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
 });

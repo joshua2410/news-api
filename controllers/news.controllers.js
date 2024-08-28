@@ -5,6 +5,7 @@ const {
   fetchArticle,
   fetchComments,
   sendComment,
+  updateVotes,
 } = require("../models/news.models");
 
 exports.getTopics = (req, res, next) => {
@@ -65,6 +66,18 @@ exports.postComment = (req, res, next) => {
   sendComment(body, article_id)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { body } = req;
+  updateVotes(body, article_id)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch((err) => {
       next(err);

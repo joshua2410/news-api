@@ -1,6 +1,5 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
-const { checkCategoryExists } = require("../db/seeds/utils");
 const format = require("pg-format");
 
 exports.fetchTopics = () => {
@@ -67,4 +66,18 @@ exports.sendComment = (data, id) => {
           });
       });
   });
+};
+
+exports.updateVotes = (data, id) => {
+  const { inc_votes } = data;
+  return db
+    .query(
+      `UPDATE articles SET votes = votes+${inc_votes} WHERE article_id = $1 RETURNING*`,
+      [id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0)
+        return Promise.reject({ status: 404, msg: "not found" });
+      else return rows;
+    });
 };
