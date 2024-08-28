@@ -299,6 +299,45 @@ describe("/api/articles", () => {
         });
     });
   });
+  describe("GET /api/articles/queries", () => {
+    it("200: when using sort_by query with order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id&order=ASC")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("article_id");
+        });
+    });
+    it("200: when using sort_by query with no order", () => {
+      return request(app)
+        .get("/api/articles?order=ASC")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("created_at");
+        });
+    });
+    it("200: when using order with no sort_by query", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length > 0).toBe(true);
+          expect(response.body.articles).toBeSortedBy("article_id", {
+            descending: true,
+          });
+        });
+    });
+    it("400: using an invalid query request", () => {
+      return request(app)
+        .get("/api/articles?order=notanorder")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
 });
 
 describe("/api/comments", () => {

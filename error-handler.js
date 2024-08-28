@@ -20,3 +20,9 @@ exports.missingBodyError = (err, req, res, next) => {
     res.status(400).send({ msg: "bad request" });
   } else next(err);
 };
+
+exports.invalidQueryRequest = (err, req, res, next) => {
+  if (err.code === "42601") {
+    res.status(400).send({ msg: "bad request" });
+  } else next(err);
+};

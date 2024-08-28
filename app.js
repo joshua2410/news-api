@@ -15,6 +15,7 @@ const {
   psqlError,
   sendError,
   missingBodyError,
+  invalidQueryRequest,
 } = require("./error-handler");
 const app = express();
 app.use(express.json());
@@ -32,5 +33,6 @@ app.use(errorHandler);
 app.use(psqlError);
 app.use(sendError);
 app.use(missingBodyError);
+app.use(invalidQueryRequest);
 
 module.exports = app;
