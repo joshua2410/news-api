@@ -422,6 +422,53 @@ describe("/api/comments", () => {
         });
     });
   });
+  describe("PATCH /api/comments/:comment_id", () => {
+    it("200: responds with updated comment", () => {
+      const updateVotes = { inc_votes: 201 };
+      return request(app)
+        .patch("/api/comments/2")
+        .send(updateVotes)
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comment.votes).toBe(215);
+          expect(response.body.comment.body).toBe(
+            "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+          );
+          expect(response.body.comment.author).toBe("butter_bridge");
+          expect(response.body.comment.article_id).toBe(1);
+        });
+    });
+    it("404: comment id is not found", () => {
+      const update = { inc_votes: 400 };
+      return request(app)
+        .patch("/api/comments/9999")
+        .send(update)
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400: comment id invalid", () => {
+      const update = { inc_votes: 6060 };
+      return request(app)
+        .patch("/api/comments/notanid")
+        .send(update)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("400: invalid patch", () => {
+      const update = { inc_votes: "notanumber" };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(update)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
 });
 
 describe("checkCategoryExists()", () => {
@@ -446,7 +493,7 @@ describe("/api/users", () => {
         });
     });
   });
-  describe.only("GET /api/users/:username", () => {
+  describe("GET /api/users/:username", () => {
     it("200: responds with singular user", () => {
       return request(app)
         .get("/api/users/butter_bridge")

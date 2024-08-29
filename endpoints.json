@@ -102,5 +102,17 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an array of all users",
+    "exampleResponse": {
+      "articles": [
+        {
+          "username": "therocklover9000",
+          "name": "dwayne",
+          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        }
+      ]
+    }
   }
 }
