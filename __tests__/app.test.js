@@ -311,7 +311,7 @@ describe("/api/articles", () => {
           expect(response.body.articles).toBeSortedBy("article_id");
         });
     });
-    it("200: when using sort_by query with no order", () => {
+    it("200: when using order with no sort_by query", () => {
       return request(app)
         .get("/api/articles?order=ASC")
         .expect(200)
@@ -320,7 +320,7 @@ describe("/api/articles", () => {
           expect(response.body.articles).toBeSortedBy("created_at");
         });
     });
-    it("200: when using order with no sort_by query", () => {
+    it("200: when using no sort_by with no order query", () => {
       return request(app)
         .get("/api/articles?sort_by=article_id")
         .expect(200)
@@ -387,6 +387,14 @@ describe("/api/articles", () => {
         .expect(404)
         .then((response) => {
           expect(response.body.msg).toBe("not found");
+        });
+    });
+    it.only("200: when filtering correct topic but no corresponding articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toBe(0);
         });
     });
   });

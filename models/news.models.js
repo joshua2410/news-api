@@ -34,12 +34,25 @@ exports.fetchArticles = (sort_by, order, topic) => {
   let queryStr = `SELECT articles.article_id, articles.author, articles.title, articles.topic,articles.created_at,articles.votes,articles.article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id`;
   const queryVals = [];
   if (topic) {
-    queryStr += ` WHERE topic = $1 GROUP BY articles.article_id`;
-    queryVals.push(topic);
+    return checkCategoryExists("topics", "slug", topic).then(() => {
+      queryStr += ` WHERE topic = $1 GROUP BY articles.article_id`;
+      queryVals.push(topic);
+      if (sort_by && order) {
+        queryStr += ` ORDER BY ${sort_by} ${order};`;
+      } else if (order) {
+        queryStr += ` ORDER BY created_at ${order};`;
+      } else if (sort_by) {
+        queryStr += ` ORDER BY ${sort_by} DESC;`;
+      } else {
+        queryStr += ` ORDER BY created_at DESC;`;
+      }
+      return db.query(queryStr, queryVals).then(({ rows }) => {
+        return rows;
+      });
+    });
   } else {
     queryStr += ` GROUP BY articles.article_id`;
   }
-
   if (sort_by && order) {
     queryStr += ` ORDER BY ${sort_by} ${order};`;
   } else if (order) {
@@ -61,6 +74,7 @@ exports.fetchComments = (id) => {
     return db
       .query(`SELECT*FROM comments WHERE article_id = $1`, [id])
       .then(({ rows }) => {
+        console.log(rows);
         return rows;
       });
   });
