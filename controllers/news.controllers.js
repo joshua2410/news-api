@@ -81,7 +81,7 @@ exports.patchVotes = (req, res, next) => {
   const { body } = req;
   updateVotes(body, article_id)
     .then((article) => {
-      res.status(201).send({ article });
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);

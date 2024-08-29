@@ -26,7 +26,7 @@ exports.fetchArticle = (id) => {
     .then(({ rows }) => {
       if (rows.length === 0)
         return Promise.reject({ msg: "not found", status: 404 });
-      else return rows;
+      else return rows[0];
     });
 };
 
@@ -76,7 +76,7 @@ exports.sendComment = (data, id) => {
           [username, body, id]
         )
         .then(({ rows }) => {
-          return rows;
+          return rows[0];
         });
     });
   });
@@ -92,7 +92,7 @@ exports.updateVotes = (data, id) => {
     .then(({ rows }) => {
       if (rows.length === 0)
         return Promise.reject({ status: 404, msg: "not found" });
-      else return rows;
+      else return rows[0];
     });
 };
 
@@ -106,7 +106,7 @@ exports.commentToDelete = (id) => {
 };
 
 exports.fetchUsers = () => {
-  return db.query(`SELECT*FROM users;`).then(({ rows }) => {
+  return db.query(`SELECT * FROM users;`).then(({ rows }) => {
     return rows;
   });
 };
