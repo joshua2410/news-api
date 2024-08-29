@@ -389,7 +389,7 @@ describe("/api/articles", () => {
           expect(response.body.msg).toBe("not found");
         });
     });
-    it.only("200: when filtering correct topic but no corresponding articles", () => {
+    it("200: when filtering correct topic but no corresponding articles", () => {
       return request(app)
         .get("/api/articles?topic=paper")
         .expect(200)
