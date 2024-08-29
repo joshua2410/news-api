@@ -15,6 +15,7 @@
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 6,
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
@@ -29,17 +30,16 @@
   "GET /api/articles/:article_id": {
     "description": "serves selected article by id",
     "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
-        }
-      ]
+      "article": {
+        "article_id": 8,
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 0,
+        "comment_count": 6
+      }
     }
   },
   "GET /api/articles/:article_id/comments": {
@@ -60,32 +60,29 @@
   "POST /api/articles/:article_id/comments": {
     "description": "posts a comment and serves new comment",
     "exampleResponse": {
-      "comments": [
-        {
-          "comment_id": 2,
-          "votes": 66,
-          "author": "PewDiePie",
-          "body": "comment contents",
-          "created_at": "2020-09-28T14:34:13.341Z",
-          "article_id": 6
-        }
-      ]
+      "comment": {
+        "comment_id": 2,
+        "votes": 66,
+        "author": "PewDiePie",
+        "body": "comment contents",
+        "created_at": "2020-09-28T14:34:13.341Z",
+        "article_id": 6
+      }
     }
   },
   "PATCH /api/articles/:article_id": {
     "description": "updates vote count in articles and serves updated article",
     "exampleResponse": {
-      "comments": [
-        {
-          "title": "Why Radiohead are the best band ever",
-          "topic": "music",
-          "author": "me",
-          "body": "Everyone else playing for second place",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 999999999,
-          "comment_count": 6
-        }
-      ]
+      "article": {
+        "article_id": 99,
+        "title": "Why Radiohead are the best band ever",
+        "topic": "music",
+        "author": "me",
+        "body": "Everyone else playing for second place",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 999999999,
+        "comment_count": 6
+      }
     }
   },
   "DELETE /api/comments/:comment_id": {
@@ -104,15 +101,41 @@
     }
   },
   "GET /api/users/:username": {
-    "description": "serves an array of all users",
+    "description": "serves a specified user",
     "exampleResponse": {
-      "articles": [
-        {
-          "username": "therocklover9000",
-          "name": "dwayne",
-          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
-        }
-      ]
+      "user": {
+        "username": "therocklover9000",
+        "name": "dwayne",
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates vote count in chosen comment and serves updated comment",
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 2,
+        "votes": 66,
+        "author": "PewDiePie",
+        "body": "comment contents",
+        "created_at": "2020-09-28T14:34:13.341Z",
+        "article_id": 6
+      }
+    }
+  },
+  "POST /api/articles": {
+    "description": "posts new article and responds with post",
+    "exampleResponse": {
+      "article": {
+        "article_id": 99,
+        "title": "Why Radiohead are the best band ever",
+        "topic": "music",
+        "author": "me",
+        "body": "Everyone else playing for second place",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 999999999,
+        "comment_count": 6
+      }
     }
   }
 }

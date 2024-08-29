@@ -398,6 +398,89 @@ describe("/api/articles", () => {
         });
     });
   });
+  describe("POST /api/articles", () => {
+    it("201: responds with newly posted article", () => {
+      const newArticle = {
+        title: "papyrus",
+        topic: "paper",
+        author: "icellusedkars",
+        body: "Egyptian paper given to them by Osiris",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.article.title).toBe("papyrus");
+          expect(response.body.article.topic).toBe("paper");
+          expect(response.body.article.author).toBe("icellusedkars");
+          expect(response.body.article.body).toBe(
+            "Egyptian paper given to them by Osiris"
+          );
+          expect(response.body.article.votes).toBe(0);
+          expect(typeof response.body.article.created_at).toBe("string");
+          expect(typeof response.body.article.article_img_url).toBe("string");
+          expect(response.body.article.article_id).toBe(14);
+          expect(response.body.article.comment_count).toBe("0");
+        });
+    });
+    it("400: bad request when missing author not in usernames", () => {
+      const newArticle = {
+        title: "papyrus",
+        topic: "paper",
+        author: "jeff",
+        body: "Egyptian paper given to them by Osiris",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("400: bad request when keys have invalid characters", () => {
+      const newArticle = {
+        title: 9,
+        topic: "paper",
+        author: "jeff",
+        body: "Egyptian paper given to them by Osiris",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("201: responds with newly posted article if given extra keys", () => {
+      const newArticle = {
+        title: "papyrus",
+        topic: "paper",
+        author: "icellusedkars",
+        body: "Egyptian paper given to them by Osiris",
+        shouldnotexist: "no",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.article.title).toBe("papyrus");
+          expect(response.body.article.topic).toBe("paper");
+          expect(response.body.article.author).toBe("icellusedkars");
+          expect(response.body.article.body).toBe(
+            "Egyptian paper given to them by Osiris"
+          );
+          expect(response.body.article.votes).toBe(0);
+          expect(typeof response.body.article.created_at).toBe("string");
+          expect(typeof response.body.article.article_img_url).toBe("string");
+          expect(response.body.article.article_id).toBe(14);
+          expect(response.body.article.comment_count).toBe("0");
+        });
+    });
+  });
 });
 
 describe("/api/comments", () => {
