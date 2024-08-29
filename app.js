@@ -9,6 +9,7 @@ const {
   patchVotes,
   deleteComment,
   getUsers,
+  getUser,
 } = require("./controllers/news.controllers");
 const { errorHandler, psqlError } = require("./error-handler");
 const app = express();
@@ -24,6 +25,7 @@ app
   .post(postComment);
 app.route("/api/comments/:comment_id").delete(deleteComment);
 app.route("/api/users").get(getUsers);
+app.route("/api/users/:username").get(getUser);
 app.use(errorHandler);
 app.use(psqlError);
 
