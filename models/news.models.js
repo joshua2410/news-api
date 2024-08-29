@@ -147,3 +147,22 @@ exports.updateCommentVotes = (data, id) => {
       else return rows[0];
     });
 };
+
+exports.sendArticle = (data) => {
+  const { title, topic, author, body } = data;
+  return db
+    .query(
+      `INSERT INTO articles (title, topic, author, body) VALUES($1, $2, $3, $4) RETURNING*`,
+      [title, topic, author, body]
+    )
+    .then(({ rows }) => {
+      return db
+        .query(
+          `SELECT articles.article_id, articles.author, articles.body, articles.title, articles.topic,articles.created_at,articles.votes,articles.article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id;`,
+          [rows[0].article_id]
+        )
+        .then(({ rows }) => {
+          return rows[0];
+        });
+    });
+};

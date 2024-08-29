@@ -12,5 +12,7 @@ exports.psqlError = (err, req, res, next) => {
     res.status(400).send({ msg: "bad request" });
   } else if (err.code === "42601") {
     res.status(400).send({ msg: "bad request" });
+  } else if (err.code === "23503") {
+    res.status(400).send({ msg: "bad request" });
   } else next(err);
 };
