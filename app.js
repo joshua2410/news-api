@@ -14,15 +14,16 @@ const { errorHandler, psqlError } = require("./error-handler");
 const app = express();
 app.use(express.json());
 
-app.get("/api/topics", getTopics);
-app.get("/api", getEnds);
-app.get("/api/articles/:article_id", getArticle);
-app.get("/api/articles", getArticles);
-app.get("/api/articles/:article_id/comments", getComments);
-app.post("/api/articles/:article_id/comments", postComment);
-app.patch("/api/articles/:article_id", patchVotes);
-app.delete("/api/comments/:comment_id", deleteComment);
-app.get("/api/users", getUsers);
+app.route("/api/topics").get(getTopics);
+app.route("/api").get(getEnds);
+app.route("/api/articles/:article_id").get(getArticle).patch(patchVotes);
+app.route("/api/articles").get(getArticles);
+app
+  .route("/api/articles/:article_id/comments")
+  .get(getComments)
+  .post(postComment);
+app.route("/api/comments/:comment_id").delete(deleteComment);
+app.route("/api/users").get(getUsers);
 app.use(errorHandler);
 app.use(psqlError);
 
