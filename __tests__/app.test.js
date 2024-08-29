@@ -446,4 +446,26 @@ describe("/api/users", () => {
         });
     });
   });
+  describe.only("GET /api/users/:username", () => {
+    it("200: responds with singular user", () => {
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.user.username).toBe("butter_bridge");
+          expect(response.body.user.name).toBe("jonny");
+          expect(response.body.user.avatar_url).toBe(
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+          );
+        });
+    });
+    it("404: responds with not found when no username found", () => {
+      return request(app)
+        .get("/api/users/howdy")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+  });
 });
