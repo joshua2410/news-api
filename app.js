@@ -10,13 +10,7 @@ const {
   deleteComment,
   getUsers,
 } = require("./controllers/news.controllers");
-const {
-  errorHandler,
-  psqlError,
-  sendError,
-  missingBodyError,
-  invalidQueryRequest,
-} = require("./error-handler");
+const { errorHandler, psqlError } = require("./error-handler");
 const app = express();
 app.use(express.json());
 
@@ -31,8 +25,5 @@ app.delete("/api/comments/:comment_id", deleteComment);
 app.get("/api/users", getUsers);
 app.use(errorHandler);
 app.use(psqlError);
-app.use(sendError);
-app.use(missingBodyError);
-app.use(invalidQueryRequest);
 
 module.exports = app;

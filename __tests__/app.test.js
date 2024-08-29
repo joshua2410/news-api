@@ -50,16 +50,14 @@ describe("/api/articles", () => {
         .get("/api/articles/2")
         .expect(200)
         .then((response) => {
-          expect(typeof response.body.article[0].author).toBe("string");
-          expect(typeof response.body.article[0].title).toBe("string");
-          expect(response.body.article[0].article_id).toBe(2);
-          expect(typeof response.body.article[0].body).toBe("string");
-          expect(typeof response.body.article[0].topic).toBe("string");
-          expect(typeof response.body.article[0].created_at).toBe("string");
-          expect(typeof response.body.article[0].votes).toBe("number");
-          expect(typeof response.body.article[0].article_img_url).toBe(
-            "string"
-          );
+          expect(typeof response.body.article.author).toBe("string");
+          expect(typeof response.body.article.title).toBe("string");
+          expect(response.body.article.article_id).toBe(2);
+          expect(typeof response.body.article.body).toBe("string");
+          expect(typeof response.body.article.topic).toBe("string");
+          expect(typeof response.body.article.created_at).toBe("string");
+          expect(typeof response.body.article.votes).toBe("number");
+          expect(typeof response.body.article.article_img_url).toBe("string");
         });
     });
     it("404: article id does not exist", () => {
@@ -83,7 +81,7 @@ describe("/api/articles", () => {
         .get("/api/articles/1")
         .expect(200)
         .then((response) => {
-          expect(response.body.article[0].comment_count).toBe("11");
+          expect(response.body.article.comment_count).toBe("11");
         });
     });
   });
@@ -164,15 +162,12 @@ describe("/api/articles", () => {
         .send(comment)
         .expect(201)
         .then((response) => {
-          expect(response.body.comment.length).toBe(1);
-          expect(response.body.comment[0].body).toBe(
-            "What an amazing article!"
-          );
-          expect(response.body.comment[0].author).toBe("butter_bridge");
-          expect(response.body.comment[0].article_id).toBe(2);
-          expect(response.body.comment[0].votes).toBe(0);
-          expect(response.body.comment[0].comment_id).toBe(19);
-          expect(typeof response.body.comment[0].created_at).toBe("string");
+          expect(response.body.comment.body).toBe("What an amazing article!");
+          expect(response.body.comment.author).toBe("butter_bridge");
+          expect(response.body.comment.article_id).toBe(2);
+          expect(response.body.comment.votes).toBe(0);
+          expect(response.body.comment.comment_id).toBe(19);
+          expect(typeof response.body.comment.created_at).toBe("string");
         });
     });
     it("200: responds with posted comment when given more keys", () => {
@@ -186,13 +181,12 @@ describe("/api/articles", () => {
         .send(comment)
         .expect(201)
         .then((response) => {
-          expect(response.body.comment.length).toBe(1);
-          expect(response.body.comment[0].body).toBe("Wow that was great");
-          expect(response.body.comment[0].author).toBe("butter_bridge");
-          expect(response.body.comment[0].article_id).toBe(4);
-          expect(response.body.comment[0].votes).toBe(0);
-          expect(response.body.comment[0].comment_id).toBe(19);
-          expect(typeof response.body.comment[0].created_at).toBe("string");
+          expect(response.body.comment.body).toBe("Wow that was great");
+          expect(response.body.comment.author).toBe("butter_bridge");
+          expect(response.body.comment.article_id).toBe(4);
+          expect(response.body.comment.votes).toBe(0);
+          expect(response.body.comment.comment_id).toBe(19);
+          expect(typeof response.body.comment.created_at).toBe("string");
         });
     });
     it("400: article id is invalid", () => {
@@ -248,30 +242,30 @@ describe("/api/articles", () => {
     });
   });
   describe("PATCH /api/articles/:article_id", () => {
-    it("201: responds with updated article", () => {
+    it("200: responds with updated article", () => {
       const update = { inc_votes: 22 };
       return request(app)
         .patch("/api/articles/1")
         .send(update)
-        .expect(201)
+        .expect(200)
         .then((response) => {
-          expect(response.body.article[0].article_id).toBe(1);
-          expect(response.body.article[0].votes).toBe(122);
-          expect(response.body.article[0].title).toBe(
+          expect(response.body.article.article_id).toBe(1);
+          expect(response.body.article.votes).toBe(122);
+          expect(response.body.article.title).toBe(
             "Living in the shadow of a great man"
           );
         });
     });
-    it("201: responds with updated article when given more keys", () => {
+    it("200: responds with updated article when given more keys", () => {
       const update = { inc_votes: 22, shouldnotexist: 6000 };
       return request(app)
         .patch("/api/articles/1")
         .send(update)
-        .expect(201)
+        .expect(200)
         .then((response) => {
-          expect(response.body.article[0].article_id).toBe(1);
-          expect(response.body.article[0].votes).toBe(122);
-          expect(response.body.article[0].title).toBe(
+          expect(response.body.article.article_id).toBe(1);
+          expect(response.body.article.votes).toBe(122);
+          expect(response.body.article.title).toBe(
             "Living in the shadow of a great man"
           );
         });
