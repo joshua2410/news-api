@@ -10,6 +10,7 @@ const {
   commentToDelete,
   fetchUsers,
   fetchUser,
+  updateCommentVotes,
 } = require("../models/news.models");
 
 exports.getTopics = (req, res, next) => {
@@ -115,6 +116,18 @@ exports.getUser = (req, res, next) => {
   fetchUser(username)
     .then((user) => {
       res.status(200).send({ user });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchCommentVotes = (req, res, next) => {
+  const { comment_id } = req.params;
+  const { body } = req;
+  updateCommentVotes(body, comment_id)
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch((err) => {
       next(err);
