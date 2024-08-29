@@ -74,7 +74,6 @@ exports.fetchComments = (id) => {
     return db
       .query(`SELECT*FROM comments WHERE article_id = $1`, [id])
       .then(({ rows }) => {
-        console.log(rows);
         return rows;
       });
   });
