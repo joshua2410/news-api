@@ -30,7 +30,8 @@ exports.fetchArticle = (id) => {
     });
 };
 
-exports.fetchArticles = (sort_by, order, topic) => {
+exports.fetchArticles = (sort_by, order, topic, limit, p) => {
+  let page = 0;
   let queryStr = `SELECT articles.article_id, articles.author, articles.title, articles.topic,articles.created_at,articles.votes,articles.article_img_url, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id`;
   const queryVals = [];
   if (topic) {
@@ -38,14 +39,35 @@ exports.fetchArticles = (sort_by, order, topic) => {
       queryStr += ` WHERE topic = $1 GROUP BY articles.article_id`;
       queryVals.push(topic);
       if (sort_by && order) {
-        queryStr += ` ORDER BY ${sort_by} ${order};`;
+        queryStr += ` ORDER BY ${sort_by} ${order}`;
       } else if (order) {
-        queryStr += ` ORDER BY created_at ${order};`;
+        queryStr += ` ORDER BY created_at ${order}`;
       } else if (sort_by) {
-        queryStr += ` ORDER BY ${sort_by} DESC;`;
+        queryStr += ` ORDER BY ${sort_by} DESC`;
       } else {
-        queryStr += ` ORDER BY created_at DESC;`;
+        queryStr += ` ORDER BY created_at DESC`;
       }
+      if (limit && p) {
+        if (p === 1) {
+          page = 0;
+        } else {
+          page = (p - 1) * limit;
+        }
+        queryStr += ` LIMIT ${limit} OFFSET ${page};`;
+      } else if (limit) {
+        queryStr += ` LIMIT ${limit};`;
+      } else if (p) {
+        const limit = 10;
+        if (p === 1) {
+          page = 0;
+        } else {
+          page = (p - 1) * limit;
+        }
+        queryStr += ` LIMIT 10 OFFSET ${page};`;
+      } else {
+        queryStr += ` LIMIT 10;`;
+      }
+
       return db.query(queryStr, queryVals).then(({ rows }) => {
         return rows;
       });
@@ -54,17 +76,38 @@ exports.fetchArticles = (sort_by, order, topic) => {
     queryStr += ` GROUP BY articles.article_id`;
   }
   if (sort_by && order) {
-    queryStr += ` ORDER BY ${sort_by} ${order};`;
+    queryStr += ` ORDER BY ${sort_by} ${order}`;
   } else if (order) {
-    queryStr += ` ORDER BY created_at ${order};`;
+    queryStr += ` ORDER BY created_at ${order}`;
   } else if (sort_by) {
-    queryStr += ` ORDER BY ${sort_by} DESC;`;
+    queryStr += ` ORDER BY ${sort_by} DESC`;
   } else {
-    queryStr += ` ORDER BY created_at DESC;`;
+    queryStr += ` ORDER BY created_at DESC`;
+  }
+  if (limit && p) {
+    if (p === 1) {
+      page = 0;
+    } else {
+      page = (p - 1) * limit;
+    }
+    queryStr += ` LIMIT ${limit} OFFSET ${page};`;
+  } else if (limit) {
+    queryStr += ` LIMIT ${limit};`;
+  } else if (p) {
+    const limit = 10;
+    if (p === 1) {
+      page = 0;
+    } else {
+      page = (p - 1) * limit;
+    }
+    queryStr += ` LIMIT 10 OFFSET ${page};`;
+  } else {
+    queryStr += ` LIMIT 10;`;
   }
   return db.query(queryStr, queryVals).then(({ rows }) => {
     if (rows.length === 0)
       return Promise.reject({ status: 404, msg: "not found" });
+    rows.total_count = rows.length;
     return rows;
   });
 };
