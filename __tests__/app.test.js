@@ -110,7 +110,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  describe("GET /api/articles/:article_id/comments", () => {
+  describe.only("GET /api/articles/:article_id/comments", () => {
     it("200: all comments for a specific article", () => {
       return request(app)
         .get("/api/articles/3/comments")
@@ -146,6 +146,38 @@ describe("/api/articles", () => {
     it("400: article id is invalid", () => {
       return request(app)
         .get("/api/articles/notanumber/comments")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("200: all comments for a specific article with limit and p queries", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=3&p1")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments.length).toBe(3);
+          response.body.comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.article_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+          });
+        });
+    });
+    it("400: invalid limit query", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=notanumber&p=1")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("400: invalid p query", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=4&p=jeff")
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
@@ -482,7 +514,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  describe.only("GET /api/articles?limit&p", () => {
+  describe("GET /api/articles?limit&p", () => {
     it("200; responds with correct page and number of items per page", () => {
       return request(app)
         .get("/api/articles?limit=5&p=2")

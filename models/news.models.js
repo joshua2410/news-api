@@ -48,21 +48,13 @@ exports.fetchArticles = (sort_by, order, topic, limit, p) => {
         queryStr += ` ORDER BY created_at DESC`;
       }
       if (limit && p) {
-        if (p === 1) {
-          page = 0;
-        } else {
-          page = (p - 1) * limit;
-        }
+        const page = limit * p - limit;
         queryStr += ` LIMIT ${limit} OFFSET ${page};`;
       } else if (limit) {
         queryStr += ` LIMIT ${limit};`;
       } else if (p) {
         const limit = 10;
-        if (p === 1) {
-          page = 0;
-        } else {
-          page = (p - 1) * limit;
-        }
+        const page = limit * p - limit;
         queryStr += ` LIMIT 10 OFFSET ${page};`;
       } else {
         queryStr += ` LIMIT 10;`;
@@ -85,21 +77,13 @@ exports.fetchArticles = (sort_by, order, topic, limit, p) => {
     queryStr += ` ORDER BY created_at DESC`;
   }
   if (limit && p) {
-    if (p === 1) {
-      page = 0;
-    } else {
-      page = (p - 1) * limit;
-    }
+    const page = limit * p - limit;
     queryStr += ` LIMIT ${limit} OFFSET ${page};`;
   } else if (limit) {
     queryStr += ` LIMIT ${limit};`;
   } else if (p) {
     const limit = 10;
-    if (p === 1) {
-      page = 0;
-    } else {
-      page = (p - 1) * limit;
-    }
+    const page = limit * p - limit;
     queryStr += ` LIMIT 10 OFFSET ${page};`;
   } else {
     queryStr += ` LIMIT 10;`;
@@ -112,13 +96,24 @@ exports.fetchArticles = (sort_by, order, topic, limit, p) => {
   });
 };
 
-exports.fetchComments = (id) => {
+exports.fetchComments = (id, limit, p) => {
   return this.fetchArticle(id).then(() => {
-    return db
-      .query(`SELECT*FROM comments WHERE article_id = $1`, [id])
-      .then(({ rows }) => {
-        return rows;
-      });
+    let queryStr = `SELECT*FROM comments WHERE article_id = $1`;
+    if (limit && p) {
+      const page = limit * p - limit;
+      queryStr += ` LIMIT ${limit} OFFSET ${page};`;
+    } else if (limit) {
+      queryStr += ` LIMIT ${limit};`;
+    } else if (p) {
+      const limit = 10;
+      const page = limit * p - limit;
+      queryStr += ` LIMIT 10 OFFSET ${page};`;
+    } else {
+      queryStr += ` LIMIT 10;`;
+    }
+    return db.query(queryStr, [id]).then(({ rows }) => {
+      return rows;
+    });
   });
 };
 
