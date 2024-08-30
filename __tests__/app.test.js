@@ -31,6 +31,21 @@ describe("/api/topics", () => {
         });
     });
   });
+  describe.only("POST /api/topics", () => {
+    it("201: returns with posted topic", () => {
+      const topicToPost = {
+        slug: "swimming",
+        description: "best olympic sport",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(topicToPost)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.topic).toMatchObject(topicToPost);
+        });
+    });
+  });
 });
 describe("/api", () => {
   describe("GET /api", () => {
@@ -110,7 +125,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  describe.only("GET /api/articles/:article_id/comments", () => {
+  describe("GET /api/articles/:article_id/comments", () => {
     it("200: all comments for a specific article", () => {
       return request(app)
         .get("/api/articles/3/comments")

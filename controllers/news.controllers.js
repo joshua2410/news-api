@@ -12,6 +12,7 @@ const {
   fetchUser,
   updateCommentVotes,
   sendArticle,
+  sendTopic,
 } = require("../models/news.models");
 
 exports.getTopics = (req, res, next) => {
@@ -142,6 +143,17 @@ exports.postArticle = (req, res, next) => {
   sendArticle(body)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postTopic = (req, res, next) => {
+  const { body } = req;
+  sendTopic(body)
+    .then((topic) => {
+      res.status(201).send({ topic });
     })
     .catch((err) => {
       next(err);
