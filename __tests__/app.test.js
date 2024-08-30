@@ -31,7 +31,7 @@ describe("/api/topics", () => {
         });
     });
   });
-  describe.only("POST /api/topics", () => {
+  describe("POST /api/topics", () => {
     it("201: returns with posted topic", () => {
       const topicToPost = {
         slug: "swimming",
@@ -573,6 +573,27 @@ describe("/api/articles", () => {
     it("400: bad request with invalid p", () => {
       return request(app)
         .get("/api/articles?limit=2&p=hello")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+  });
+  describe("DELETE /api/articles/:article_id", () => {
+    it("204 responds with nothing", () => {
+      return request(app).delete("/api/articles/4").expect(204);
+    });
+    it("404 not found", () => {
+      return request(app)
+        .delete("/api/articles/1000")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400 bad request", () => {
+      return request(app)
+        .delete("/api/articles/notfound")
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
