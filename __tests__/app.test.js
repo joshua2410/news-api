@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const endpoints = require("../endpoints.json");
 const { checkCategoryExists } = require("../db/seeds/utils");
+const articles = require("../db/data/test-data/articles");
 require("jest-sorted");
 
 beforeEach(() => {
@@ -109,7 +110,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  describe("GET /api/articles/:article_id/comments", () => {
+  describe.only("GET /api/articles/:article_id/comments", () => {
     it("200: all comments for a specific article", () => {
       return request(app)
         .get("/api/articles/3/comments")
@@ -145,6 +146,38 @@ describe("/api/articles", () => {
     it("400: article id is invalid", () => {
       return request(app)
         .get("/api/articles/notanumber/comments")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("200: all comments for a specific article with limit and p queries", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=3&p1")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.comments.length).toBe(3);
+          response.body.comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.article_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+          });
+        });
+    });
+    it("400: invalid limit query", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=notanumber&p=1")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("400: invalid p query", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=4&p=jeff")
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
@@ -478,6 +511,56 @@ describe("/api/articles", () => {
           expect(typeof response.body.article.article_img_url).toBe("string");
           expect(response.body.article.article_id).toBe(14);
           expect(response.body.article.comment_count).toBe("0");
+        });
+    });
+  });
+  describe("GET /api/articles?limit&p", () => {
+    it("200; responds with correct page and number of items per page", () => {
+      return request(app)
+        .get("/api/articles?limit=5&p=2")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toBe(5);
+          expect(response.body.total_count).toBe(5);
+        });
+    });
+    it("200; responds with correct page and number of items per page when using all queries", () => {
+      return request(app)
+        .get(
+          "/api/articles?limit=5&p=2&sort_by=article_id&order=ASC&topic=mitch"
+        )
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy("article_id");
+          expect(response.body.articles.length).toBe(5);
+          expect(response.body.total_count).toBe(5);
+          response.body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    it("404: not found when no results", () => {
+      return request(app)
+        .get("/api/articles?limit=12&p=4")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    it("400: bad request with invalid limit", () => {
+      return request(app)
+        .get("/api/articles?limit=hello&p=4")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    it("400: bad request with invalid p", () => {
+      return request(app)
+        .get("/api/articles?limit=2&p=hello")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
         });
     });
   });
