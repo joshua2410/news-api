@@ -138,5 +138,17 @@
         "comment_count": 6
       }
     }
+  },
+  "POST /api/topics": {
+    "description": "posts new topic and responds with topic",
+    "exampleResponse": {
+      "topic": {
+        "topic": "topic name here",
+        "description": "description here"
+      }
+    }
+  },
+  "DELETE /api/articles/:comment_id": {
+    "description": "deletes selected article and all related comments serves nothing"
   }
 }

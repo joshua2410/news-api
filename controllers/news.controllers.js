@@ -13,6 +13,7 @@ const {
   updateCommentVotes,
   sendArticle,
   sendTopic,
+  articleToDelete,
 } = require("../models/news.models");
 
 exports.getTopics = (req, res, next) => {
@@ -154,6 +155,17 @@ exports.postTopic = (req, res, next) => {
   sendTopic(body)
     .then((topic) => {
       res.status(201).send({ topic });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  articleToDelete(article_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
