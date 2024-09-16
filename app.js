@@ -15,9 +15,11 @@ const {
   postTopic,
   deleteArticle,
 } = require("./controllers/news.controllers");
+const cors = require("cors");
 const { errorHandler, psqlError } = require("./error-handler");
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.route("/api/topics").get(getTopics).post(postTopic);
 app.route("/api").get(getEnds);
